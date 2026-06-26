@@ -681,12 +681,16 @@
                 name.innerText = "???";
             }
         }
+    </script
+        </body<script>
+      // Регистрация сервис-воркера
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('PWA успешно настроено!', reg))
+            .catch(err => console.log('Ошибка PWA:', err));
+        });
+      }
     </script>
-
-</body<script>
-  if ('serviceWorker' in navigator) {
-    ...
-  }
-</script>
-content://com.android.externalstorage...
+</body>
 </html>
