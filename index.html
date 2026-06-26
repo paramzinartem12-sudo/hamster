@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html>
+<head><link rel="manifest" href="manifest.json">
+
+    <title>Hamster Tycoon: Ultimate Edition</title>
+    <style>
+        body {
+            background-color: #1a252f;
+            color: #ffffff;
+            text-align: center;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+        .header {
+            background-color: #2c3e50;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 3px solid #f1c40f;
+        }
+        
+        /* НАВИГАЦИЯ */
+        .nav-bar {
+            display: flex;
+            background-color: #34495e;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+        }
+        .nav-btn {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto;
+            margin: 0;
+            font-size: 14px;
+        }
+        .nav-btn.active {
+            background-color: #f1c40f;
+            color: #1a252f;
+        }
+
+        /* СТРАНИЦЫ */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        .score-container {
+            font-size: 28px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+        .stage {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .hamster-3d {
+            width: 130px;
+            height: 130px;
+            background-color: #e67e22;
+            border-radius: 50%;
+            font-size: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.05s ease;
+            box-shadow: 0px 6px 0px #d35400, 0px 12px 15px rgba(0,0,0,0.4);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .panel {
+            background-color: #2c3e50;
+            margin: 15px auto;
+            padding: 15px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 320px;
+        }
+        .panel-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 15px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+        }
+        
+        .promo-input {
+            width: 90%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #34495e;
+            background-color: #1a252f;
+            color: white;
+            text-align: center;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+        .promo-message {
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .shop-item {
+            background-color: #34495e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-name {
+            font-weight: bold;
+        }
+        .shop-item button {
+            width: auto;
+            margin-top: 0;
+            padding: 8px 12px;
+        }
+        
+        .ach-item {
+            background-color: #34495e;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        .ach-item.locked {
+            opacity: 0.4;
+        }
+        .ach-badge {
+            font-size: 24px;
+            background-color: rgba(255,255,255,0.1);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ach-info-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .ach-info-desc {
+            font-size: 12px;
+            color: #bdc3c7;
+            margin-top: 2px;
+        }
+
+        .floating-text {
+            position: absolute;
+            font-size: 32px;
+            font-weight: 900;
+            color: #f1c40f;
+            pointer-events: none;
+            text-shadow: 
+                0px 2px 0px #d35400,
+                0px 4px 0px #b33600,
+                0px 6px 5px rgba(0,0,0,0.6);
+            animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            50% { transform: translateY(-50px) scale(1.1); }
+            100% { transform: translateY(-120px) scale(1); opacity: 0; }
+        }
+        
+        .xbox-notification {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #107c10;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
+            font-family: sans-serif;
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999;
+            width: 280px;
+            text-align: left;
+        }
+        .xbox-notification.show {
+            bottom: 40px;
+        }
+        .xbox-icon {
+            background-color: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .xbox-text-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a3e0a3;
+        }
+        .xbox-text-name {
+            font-size: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">Hamster Tycoon v6.0 🎮</div>
+    
+    <div class="nav-bar">
+        <button id="nav-game" class="nav-btn active" onclick="switchPage('game')">Игра 🐹</button>
+        <button id="nav-shop" class="nav-btn" onclick="switchPage('shop')">Магазин 🛍️</button>
+        <button id="nav-ach" class="nav-btn" onclick="switchPage('ach')">Ачивки 🏆</button>
+    </div>
+    
+    <div class="score-container">
+        🪙 <span id="score">0</span>
+    </div>
+
+    <div id="page-game" class="page active">
+        <div class="stage">
+            <div id="hamster" class="hamster-3d" onclick="clickHamster(event)">🐹</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Секретные коды 🎟️</div>
+            <input type="text" id="promo-input" class="promo-input" placeholder="Введите код..." autocomplete="off">
+            <button onclick="activatePromo()">Активировать</button>
+            <div id="promo-msg" class="promo-message"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Прокачка 🚀</div>
+            <button id="upgrade-btn" onclick="buyUpgrade()">Купить +1 (Цена: 10)</button>
+            <div style="font-size: 14px; color: #bdc3c7; margin-top: 8px;">
+                Сила клика: +<span id="click-power">1</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-shop" class="page">
+        <div class="panel">
+            <div class="panel-title">Внешний вид кнопки 🎭</div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🤖 Робо-кнопка</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 40</div>
+                </div>
+                <button id="skin-btn-robot" onclick="buySkin('robot', 40)">Купить</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🦄 Неон-кнопка</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 80</div>
+                </div>
+                <button id="skin-btn-neon" onclick="buySkin('neon', 80)">Купить</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">💎 Алмаз-кнопка</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 200</div>
+                </div>
+                <button id="skin-btn-diamond" onclick="buySkin('diamond', 200)">Купить</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Цветовые фоны 🎨</div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🟢 Киберпанк</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 25</div>
+                </div>
+                <button id="bg-btn-cyber" onclick="buyBackground('cyber', 25)">Купить</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🌌 Космос</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 50</div>
+                </div>
+                <button id="bg-btn-space" onclick="buyBackground('space', 50)">Купить</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🟣 Закат</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 100</div>
+                </div>
+                <button id="bg-btn-sunset" onclick="buyBackground('sunset', 100)">Купить</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">👑 Замок</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 150</div>
+                </div>
+                <button id="bg-btn-castle" onclick="buyBackground('castle', 150)">Купить</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🔴 Лава</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Цена: 300</div>
+                </div>
+                <button id="bg-btn-lava" onclick="buyBackground('lava', 300)">Купить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-ach" class="page">
+        <div class="panel" style="max-width: 340px;">
+            <div class="panel-title">Твои Достижения 🏆</div>
+            
+            <div id="ach-item-first" class="ach-item locked">
+                <div class="ach-badge" id="ach-icon-first">🔒</div>
+                <div>
+                    <div class="ach-info-name" id="ach-name-first">???</div>
+                    <div class="ach-info-desc">Сделай свой самый первый клик</div>
+                </div>
+            </div>
+
+            <div id="ach-item-collector" class="ach-item locked">
+                <div class="ach-badge" id="ach-icon-collector">🔒</div>
+                <div>
+                    <div class="ach-info-name" id="ach-name-collector">???</div>
+                    <div class="ach-info-desc">Накопи 100 монет на балансе</div>
+                </div>
+            </div>
+
+            <div id="ach-item-fashion" class="ach-item locked">
+                <div class="ach-badge" id="ach-icon-fashion">🔒</div>
+                <div>
+                    <div class="ach-info-name" id="ach-name-fashion">???</div>
+                    <div class="ach-info-desc">Купи любой новый скин для кнопки</div>
+                </div>
+            </div>
+
+            <div id="ach-item-veteran" class="ach-item locked">
+                <div class="ach-badge" id="ach-icon-veteran">🔒</div>
+                <div>
+                    <div class="ach-info-name" id="ach-name-veteran">???</div>
+                    <div class="ach-info-desc">Прокачай силу клика до 20 уровня</div>
+                </div>
+            </div>
+
+            <div id="ach-item-king" class="ach-item locked">
+                <div class="ach-badge" id="ach-icon-king">🔒</div>
+                <div>
+                    <div class="ach-info-name" id="ach-name-king">???</div>
+                    <div class="ach-info-desc">Прокачай силу клика до 50 уровня</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="xbox-toast" class="xbox-notification">
+        <div class="xbox-icon">🏆</div>
+        <div>
+            <div class="xbox-text-title">Достижение разблокировано</div>
+            <div class="xbox-text-name" id="xbox-toast-name">Название ачивки</div>
+        </div>
+    </div>
+
+    <script>
+        let score = Number(localStorage.getItem("h_score")) || 0;
+        let clickPower = Number(localStorage.getItem("h_power")) || 1;
+        let upgradeCost = Number(localStorage.getItem("h_cost")) || 10;
+        
+        let purchasedBackgrounds = JSON.parse(localStorage.getItem("h_bg_list")) || ["default"];
+        let currentBackground = localStorage.getItem("h_current_bg") || "default";
+
+        let purchasedSkins = JSON.parse(localStorage.getItem("h_skin_list")) || ["default"];
+        let currentSkin = localStorage.getItem("h_current_skin") || "default";
+
+        let unlockedAchievements = JSON.parse(localStorage.getItem("h_achievements")) || [];
+        let usedPromos = JSON.parse(localStorage.getItem("h_used_promos")) || [];
+
+        const bgColors = {
+            default: "#1a252f", cyber: "#0f2015", space: "#0b132b",
+            sunset: "#2c1a30", castle: "#5c4d3c", lava: "#3a0f0f"
+        };
+
+        const skinStyles = {
+            default: { bg: "#e67e22", shadow: "0px 6px 0px #d35400" },
+            robot: { bg: "#7f8c8d", shadow: "0px 6px 0px #95a5a6" },
+            neon: { bg: "#9b59b6", shadow: "0px 6px 0px #8e44ad" },
+            diamond: { bg: "#3498db", shadow: "0px 6px 0px #2980b9" }
+        };
+
+        updateUI();
+        applyBackground(currentBackground);
+        applySkin(currentSkin);
+
+        // ЛОГИКА ТРЕХ СТРАНИЦ
+        function switchPage(pageName) {
+            // Скрываем все страницы
+            document.getElementById("page-game").classList.remove("active");
+            document.getElementById("page-shop").classList.remove("active");
+            document.getElementById("page-ach").classList.remove("active");
+            
+            // Снимаем подсветку со всех кнопок
+            document.getElementById("nav-game").classList.remove("active");
+            document.getElementById("nav-shop").classList.remove("active");
+            document.getElementById("nav-ach").classList.remove("active");
+
+            // Активируем нужную страницу и подсвечиваем кнопку
+            if (pageName === 'game') {
+                document.getElementById("page-game").classList.add("active");
+                document.getElementById("nav-game").classList.add("active");
+            } else if (pageName === 'shop') {
+                document.getElementById("page-shop").classList.add("active");
+                document.getElementById("nav-shop").classList.add("active");
+            } else if (pageName === 'ach') {
+                document.getElementById("page-ach").classList.add("active");
+                document.getElementById("nav-ach").classList.add("active");
+            }
+        }
+
+        function clickHamster(event) {
+            score = score + clickPower;
+            saveGame();
+            createFloatingText(event);
+            checkAchievements();
+            updateUI();
+        }
+
+        const hamsterEl = document.getElementById("hamster");
+        hamsterEl.addEventListener("touchstart", () => {
+            const shadowColor = skinStyles[currentSkin].shadow.split(" ").pop();
+            hamsterEl.style.transform = "translateY(4px)";
+            hamsterEl.style.boxShadow = `0px 2px 0px ${shadowColor}, 0px 4px 6px rgba(0,0,0,0.6)`;
+        });
+        hamsterEl.addEventListener("touchend", () => {
+            hamsterEl.style.transform = "translateY(0px)";
+            applySkin(currentSkin);
+        });
+
+        function createFloatingText(event) {
+            let textElement = document.createElement("div");
+            textElement.className = "floating-text";
+            textElement.innerText = "+" + clickPower;
+            textElement.style.left = (event.clientX - 20) + "px";
+            textElement.style.top = (event.clientY - 30) + "px";
+            document.body.appendChild(textElement);
+            setTimeout(() => { textElement.remove(); }, 800);
+        }
+
+        function activatePromo() {
+            let input = document.getElementById("promo-input");
+            let msg = document.getElementById("promo-msg");
+            let code = input.value.trim().toUpperCase();
+
+            if (code === "") return;
+
+            if (usedPromos.includes(code)) {
+                msg.style.color = "#e74c3c";
+                msg.innerText = "Код уже активирован!";
+                return;
+            }
+
+            if (code === "BONUS5K") {
+                score += 5000;
+                usedPromos.push(code);
+                msg.style.color = "#2ecc71";
+                msg.innerText = "Успешно! +5000 монет 🪙";
+            } else if (code === "XBOXSHIELD") {
+                if (!purchasedSkins.includes("diamond")) purchasedSkins.push("diamond");
+                usedPromos.push(code);
+                msg.style.color = "#2ecc71";
+                msg.innerText = "Успешно! Открыта Алмаз-кнопка 💎";
+            } else {
+                msg.style.color = "#e74c3c";
+                msg.innerText = "Неверный код!";
+                return;
+            }
+
+            input.value = "";
+            saveGame();
+            checkAchievements();
+            updateUI();
+        }
+
+        function buyUpgrade() {
+            if (score >= upgradeCost) {
+                score = score - upgradeCost;
+                clickPower = clickPower + 1;
+                upgradeCost = Math.round(upgradeCost * 1.5);
+                saveGame();
+                checkAchievements();
+                updateUI();
+            }
+        }
+
+        function checkAchievements() {
+            if (score > 0 && !unlockedAchievements.includes("first_click")) {
+                triggerXboxAchievement("first_click", "🐾 Первый шаг");
+            }
+            if (score >= 100 && !unlockedAchievements.includes("collector")) {
+                triggerXboxAchievement("collector", "🪙 Копилка");
+            }
+            if (purchasedSkins.length > 1 && !unlockedAchievements.includes("fashion")) {
+                triggerXboxAchievement("fashion", "🎭 Модник");
+            }
+            if (clickPower >= 20 && !unlockedAchievements.includes("veteran")) {
+                triggerXboxAchievement("veteran", "🚀 Ветеран клика");
+            }
+            if (clickPower >= 50 && !unlockedAchievements.includes("king")) {
+                triggerXboxAchievement("king", "👑 Повелитель хомяков");
+            }
+        }
+
+        function triggerXboxAchievement(id, name) {
+            unlockedAchievements.push(id);
+            localStorage.setItem("h_achievements", JSON.stringify(unlockedAchievements));
+            
+            let toast = document.getElementById("xbox-toast");
+            let toastName = document.getElementById("xbox-toast-name");
+            
+            toastName.innerText = name;
+            toast.classList.add("show");
+            
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function buySkin(skinName, cost) {
+            if (purchasedSkins.includes(skinName)) {
+                currentSkin = skinName;
+                applySkin(skinName);
+                saveGame();
+                updateUI();
+                return;
+            }
+            if (score >= cost) {
+                score = score - cost;
+                purchasedSkins.push(skinName);
+                currentSkin = skinName;
+                applySkin(skinName);
+                saveGame();
+                checkAchievements();
+                updateUI();
+            }
+        }
+
+        function applySkin(skinName) {
+            const hamster = document.getElementById("hamster");
+            hamster.style.backgroundColor = skinStyles[skinName].bg;
+            hamster.style.boxShadow = skinStyles[skinName].shadow + ", 0px 12px 15px rgba(0,0,0,0.4)";
+        }
+
+        function buyBackground(bgName, cost) {
+            if (purchasedBackgrounds.includes(bgName)) {
+                currentBackground = bgName;
+                applyBackground(bgName);
+                saveGame();
+                updateUI();
+                return;
+            }
+            if (score >= cost) {
+                score = score - cost;
+                purchasedBackgrounds.push(bgName);
+                currentBackground = bgName;
+                applyBackground(bgName);
+                saveGame();
+                updateUI();
+            }
+        }
+
+        function applyBackground(bgName) {
+            document.body.style.backgroundColor = bgColors[bgName];
+        }
+
+        function saveGame() {
+            localStorage.setItem("h_score", score);
+            localStorage.setItem("h_power", clickPower);
+            localStorage.setItem("h_cost", upgradeCost);
+            localStorage.setItem("h_current_bg", currentBackground);
+            localStorage.setItem("h_bg_list", JSON.stringify(purchasedBackgrounds));
+            localStorage.setItem("h_current_skin", currentSkin);
+            localStorage.setItem("h_skin_list", JSON.stringify(purchasedSkins));
+            localStorage.setItem("h_used_promos", JSON.stringify(usedPromos));
+        }
+
+        function updateUI() {
+            document.getElementById("score").innerText = score;
+            document.getElementById("click-power").innerText = clickPower;
+            
+            let upBtn = document.getElementById("upgrade-btn");
+            upBtn.innerText = "Купить +1 (Цена: " + upgradeCost + ")";
+            upBtn.disabled = score < upgradeCost;
+
+            updateItemButton("cyber", "bg-btn-cyber", 25, purchasedBackgrounds, currentBackground);
+            updateItemButton("space", "bg-btn-space", 50, purchasedBackgrounds, currentBackground);
+            updateItemButton("sunset", "bg-btn-sunset", 100, purchasedBackgrounds, currentBackground);
+            updateItemButton("castle", "bg-btn-castle", 150, purchasedBackgrounds, currentBackground);
+            updateItemButton("lava", "bg-btn-lava", 300, purchasedBackgrounds, currentBackground);
+
+            updateItemButton("robot", "skin-btn-robot", 40, purchasedSkins, currentSkin);
+            updateItemButton("neon", "skin-btn-neon", 80, purchasedSkins, currentSkin);
+            updateItemButton("diamond", "skin-btn-diamond", 200, purchasedSkins, currentSkin);
+            
+            updateAchievementItem("first_click", "ach-item-first", "ach-icon-first", "ach-name-first", "🐾 Первый шаг");
+            updateAchievementItem("collector", "ach-item-collector", "ach-icon-collector", "ach-name-collector", "🪙 Копилка");
+            updateAchievementItem("fashion", "ach-item-fashion", "ach-icon-fashion", "ach-name-fashion", "🎭 Модник");
+            updateAchievementItem("veteran", "ach-item-veteran", "ach-icon-veteran", "ach-name-veteran", "🚀 Ветеран клика");
+            updateAchievementItem("king", "ach-item-king", "ach-icon-king", "ach-name-king", "👑 Повелитель хомяков");
+        }
+
+        function updateItemButton(name, btnId, cost, purchasedList, currentActive) {
+            let btn = document.getElementById(btnId);
+            if (!btn) return;
+            
+            if (currentActive === name) {
+                btn.innerText = "Активен";
+                btn.disabled = true;
+                btn.style.backgroundColor = "#3498db";
+            } else if (purchasedList.includes(name)) {
+                btn.innerText = "Включить";
+                btn.disabled = false;
+                btn.style.backgroundColor = "#e67e22";
+            } else {
+                btn.innerText = "Купить";
+                btn.disabled = score < cost;
+                btn.style.backgroundColor = "#2ecc71";
+            }
+        }
+
+        function updateAchievementItem(id, itemId, iconId, nameId, realName) {
+            let item = document.getElementById(itemId);
+            let icon = document.getElementById(iconId);
+            let name = document.getElementById(nameId);
+            
+            if (unlockedAchievements.includes(id)) {
+                item.classList.remove("locked");
+                icon.innerText = "🏆";
+                name.innerText = realName + " (Получено)";
+            } else {
+                item.classList.add("locked");
+                icon.innerText = "🔒";
+                name.innerText = "???";
+            }
+        }
+    </script>
+
+</body<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('PWA успешно настроено!', reg))
+        .catch(err => console.log('Ошибка PWA:', err));
+    });
+  }
+</script>
+content://com.android.externalstorage.documents/tree/primary%3A%D0%BC%D0%BE%D0%B8%20%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F::primary:мои приложения/хомяк/п/index.html
+</html>
